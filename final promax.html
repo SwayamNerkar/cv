@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swayam's Portfolio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+
+
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --dark-bg: #0a0a0a;
+            --accent: #00ff41;
+        }
+
+        *{
+            margin: 0;     
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+            color: var(--matrix-green);
+        }
+
+        body {
+            background: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Terminal Header */
+        .terminal-header {
+            border: 1px solid var(--matrix-green);
+            padding: 10px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .terminal-header::before {
+            content: "$ portfolio.exe";
+            position: absolute;
+            top: -15px;
+            left: 10px;
+            background: var(--dark-bg);
+            padding: 0 10px;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--matrix-green);
+            margin-bottom: 40px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.8), rgba(10, 10, 10, 0.8));
+            backdrop-filter: blur(5px);
+        }
+
+        nav a {
+            text-decoration: none;
+            padding: 10px 20px;
+            transition: all 0.3s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        nav a:hover {
+            background: var(--matrix-green);
+            color: var(--dark-bg);
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--matrix-green);
+            display: none;
+        }
+
+        section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        /* Project Cards */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .project-card {
+            border: 1px solid var(--matrix-green);
+            padding: 15px;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            background: rgba(0, 255, 65, 0.1);
+        }
+
+        /* Skills */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-item {
+            position: relative;
+            padding: 10px;
+            border: 1px solid var(--matrix-green);
+        }
+
+        .skill-progress {
+            height: 5px;
+            background: var(--matrix-green);
+            margin-top: 5px;
+            transition: width 1s;
+        }
+
+        /* Contact Form */
+        .contact-form {
+            display: grid;
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        input, textarea {
+            background: transparent;
+            border: 1px solid var(--matrix-green);
+            padding: 10px;
+            width: 100%;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--matrix-green);
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: var(--matrix-green);
+            color: var(--dark-bg);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes wave {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        .typing-effect::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        html {
+    scroll-behavior: smooth;
+}
+.social-links a {
+    color: var(--matrix-green);
+    font-size: 24px;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+
+.social-links a:hover {
+    color: #ffffff;
+}
+</style>
+
+
+
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+
+    
+    <div class="container">
+        <div class="terminal-header">
+            <h1 class="typing-effect" id="header-text"></h1>
+        </div>
+        
+
+            <nav>
+                <a onclick="showSection('about')"><i class="fas fa-user"></i> About</a>
+                <a onclick="showSection('projects')"><i class="fas fa-project-diagram"></i> Projects</a>
+                <a onclick="showSection('skills')"><i class="fas fa-tools"></i> Skills</a>
+                <a onclick="showSection('experience')"><i class="fas fa-briefcase"></i> Experience</a>
+                <a onclick="showSection('contact')"><i class="fas fa-envelope"></i> Contact</a>
+            </nav>
+
+        <section id="about" class="active">
+            <h2>About Me</h2>
+            
+                <p>"Hi, I'm Swayam Nerkar,
+                    a passionate Artificial Intelligence enthusiast and aspiring Full-Stack Developer. 
+                    With strong skills in Python, web development, and introductory Android development,
+                    I am eager to explore and innovate in the field of AI/ML. 
+                    I enjoy solving complex problems and creating user-centric solutions that make a difference.
+                    My experiences as a project leader and intern have honed my technical and team collaboration skills.
+                    I’m excited to connect, share ideas, and contribute to impactful projects!"
+                </p>
+
+               
+                
+        </section>
+
+        <div class="social-links">
+            <p>
+            <a href="https://www.linkedin.com/in/swayam-nerkar-79043322b" target="_blank"><i class="fab fa-linkedin"></i></a>
+            <a href="https://github.com/SwayamNerkar" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="mailto:swayamnerkar16@gmail.com"><i class="fas fa-envelope"></i></a> </p>
+        </div>
+
+        <section id="projects">
+            <h2>Projects</h2>
+            <div class="project-grid">
+                <div class="project-card">
+                    <h3>Project 1</h3>
+                    <p><h3>Mini Games</h3>
+                        <p> Created Some mini games for kids by python,html,css & js.. ex. Snake game,4 Connect etc.</p></p>
+                </div>
+                <div class="project-card">
+                    <h3>Project 2</h3>
+                    <p><h3>Curriculum Schedule System Website</h3>
+                        <p>Developed a curriculum schedule system website for colleges/universities to offer a seamless user interface and real-time functionality.</p></p>
+                </div>
+                <div class="project-card">
+                    <h3>Project 3</h3>
+                    <p><h3>InterDecora</h3>
+                        <p> Interior decoration generator website where people can upload their room images and get interior decoration suggestions.</p></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            <h2>Skills</h2>
+            <div class="skills-container">
+                <div class="skill-item">
+                    <span>JavaScript</span>
+                    <div class="skill-progress" style="width: 20%"></div>
+                </div>
+                <div class="skill-item">
+                    <span>Python</span>
+                    <div class="skill-progress" style="width: 80%"></div>
+                </div>
+                <div class="skill-item">
+                    <span>html</span>
+                    <div class="skill-progress" style="width: 90%"></div>
+                </div>
+                <div class="skill-item">
+                    <span>css</span>
+                    <div class="skill-progress" style="width: 50%"></div>
+                </div>
+                <div class="skill-item">
+                    <span>c++</span>
+                    <div class="skill-progress" style="width: 75%"></div>
+                </div>
+            </div>
+        </section>
+
+<section id="experience">
+    <h2>Experience</h2>
+    <div class="experience-item">
+        <h3>Intern - INTERNPE</h3>
+        <p>October 2024 - November 2024</p>
+        <ul>
+            <li>Completed a web development learning internship.</li>
+        </ul>
+    </div>
+
+    <div class="experience-item">
+        <h3>Intern - Codec Technologies,mumbai,India</h3>
+        <p>November 2024 - January 2025</p>
+        <ul>
+            <li>Completed an AI learning internship focused on Ai concepts , 
+                python and about machine learning with deep learning and neural networks & RL .</li>
+        </ul>
+    </div>
+------------------------------------------------------------------------------------------------------------------
+    <h2>Education</h2>
+
+    <div class="experience-item">
+        <h3>School</h3>                     
+        <p>Tip Top Convent, Nagpur.</p>
+        <ul>                                 
+            <li>Completed SSC & HSC education.</li>
+        </ul>
+    </div>
+------------------------------------------------------------------------------------------------------------------
+    <div class="experience-item">
+        <h3>College</h3>
+        <p>GHRCEMN</p>
+        <ul>
+            <li>Completed my B.tech in Artificial intelligence Engineering. (AIE) </li>
+        </ul>
+    </div>
+</section>
+        
+
+        <section id="contact">
+            <h2>Contact</h2>
+            <form class="contact-form">
+                <input type="text" placeholder="Name" required>
+                <input type="email" placeholder="Email" required>
+                <textarea placeholder="Message" rows="5" required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+        </section>
+    </div>
+
+
+
+
+    <script>
+        // Matrix Rain Effect
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+        const drops = [];
+        const fontSize = 16;
+        const columns = canvas.width/fontSize;
+
+        for(let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+
+            for(let i = 0; i < drops.length; i++) {
+                const text = matrix[Math.floor(Math.random() * matrix.length)];
+                ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+
+                if(drops[i]*fontSize > canvas.height && Math.random() > 0.975)
+                    drops[i] = 0;
+
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 35);
+
+        // Section Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Typing Effect
+        const headerText = "Welcome to Swayam's Portfolio";
+        let i = 0;
+        const speed = 100;
+
+        function typeWriter() {
+            if (i < headerText.length) {
+                document.getElementById("header-text").innerHTML += headerText.charAt(i);
+                i++;
+                setTimeout(typeWriter, speed);
+            }
+        }
+
+        typeWriter();
+
+        // Form Submission
+        document.querySelector('.contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Message sent successfully!');
+            this.reset();
+        });
+
+        // Responsive Canvas
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+function toggleTheme() {
+    const root = document.documentElement;
+    if (root.style.getPropertyValue('--dark-bg') === '#0a0a0a') {
+        root.style.setProperty('--dark-bg', '#ffffff');
+        root.style.setProperty('--matrix-green', '#000000');
+        root.style.setProperty('color', '#000000');
+    } else {
+        root.style.setProperty('--dark-bg', '#0a0a0a');
+        root.style.setProperty('--matrix-green', '#00ff41');
+        root.style.setProperty('color', '#00ff41');
+    }
+}
+
+// Get the button at bottom,...
+const backToTopButton = document.getElementById('back-to-top');
+
+window.onscroll = function() {
+    if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+        backToTopButton.style.display = "block";
+    } else {
+        backToTopButton.style.display = "none";
+    }
+};
+
+backToTopButton.onclick = function() {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+};
+
+function filterProjects(category) {
+    document.querySelectorAll('.project-card').forEach(card => {
+        card.style.display = card.dataset.category === category || category === 'all' ? 'block' : 'none';
+    });
+}
+
+    </script>
+    <button id="back-to-top" style="display:none; position:fixed; bottom:20px; right:20px;">↑</button>
+</body>
+</html>
